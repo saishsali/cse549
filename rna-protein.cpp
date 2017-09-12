@@ -1,11 +1,10 @@
-#include <iostream>
+#include <fstream>
 #include <map>
 #include <string>
 #include <iterator>
 using namespace std;
 
 int main() {
-    int T;
     string rna;
     map<string, string>:: iterator rna_codon_itr;
     map<string, string> rna_codon = {
@@ -26,19 +25,19 @@ int main() {
         {"UGA", "Stop"}, {"CGA", "R"}, {"AGA", "R"}, {"GGA", "G"},
         {"UGG", "W"},    {"CGG", "R"}, {"AGG", "R"}, {"GGG", "G"}
     };
+    ifstream fin("input.txt");
+    ofstream fout("output.txt");
 
-    cin >> T;
+    fin >> rna;
 
-    while (T--) {
-        cin >> rna;
-
-        for (int i = 0; i < rna.length(); i += 3) {
-            rna_codon_itr = rna_codon.find(rna.substr(i, 3));
-            if (rna_codon_itr != rna_codon.end() && rna_codon_itr->second.compare("Stop") != 0)
-                cout << rna_codon_itr->second;
-        }
-        cout << endl;
+    for (int i = 0; i < rna.length(); i += 3) {
+        rna_codon_itr = rna_codon.find(rna.substr(i, 3));
+        if (rna_codon_itr != rna_codon.end() && rna_codon_itr->second.compare("Stop") != 0)
+            fout << rna_codon_itr->second;
     }
+    fout << endl;
+    fin.close();
+    fout.close();
 
     return 0;
 }

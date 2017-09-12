@@ -1,5 +1,5 @@
-#include <iostream>
 #include <string>
+#include <fstream>
 using namespace std;
 #define SIZE 100
 
@@ -85,20 +85,22 @@ string shortest_superstring(string dna[], int num_dna) {
 }
 
 int main() {
-    int T, num_dna;
-    string dna[SIZE], str;
+    int i = -1;
+    string dna[SIZE], line;
+    ifstream fin("input.txt");
+    ofstream fout("output.txt");
 
-    cin >> T;
-
-    while (T--) {
-        cin >> num_dna;
-
-        int i = 0;
-        while (i < num_dna) {
-            cin >> dna[i++];
+    while (getline(fin, line)) {
+        if (line.compare(0, 10, ">Rosalind_") == 0) {
+            i++;
+        } else {
+            dna[i] += line;
         }
-
-        cout << shortest_superstring(dna, num_dna) << endl;
     }
+
+    fout << shortest_superstring(dna, i + 1) << endl;
+    fin.close();
+    fout.close();
+
     return 0;
 }

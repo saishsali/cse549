@@ -1,7 +1,7 @@
-#include <iostream>
 #include <map>
 #include <string>
 #include <iterator>
+#include <fstream>
 using namespace std;
 
 map<string, int> get_amino_acid_frequency(map<string, string> rna_codon) {
@@ -42,11 +42,13 @@ int main() {
         {"UGA", "Stop"}, {"CGA", "R"}, {"AGA", "R"}, {"GGA", "G"},
         {"UGG", "W"},    {"CGG", "R"}, {"AGG", "R"}, {"GGG", "G"}
     };
+    ifstream fin("input.txt");
+    ofstream fout("output.txt");
 
     amino_acid_frequency = get_amino_acid_frequency(rna_codon);
 
     num_RNA = amino_acid_frequency["Stop"];
-    cin >> protein;
+    fin >> protein;
 
     for (int i = 0; i < protein.length(); i++) {
         num_RNA *= amino_acid_frequency[string(1, protein[i])];
@@ -54,7 +56,7 @@ int main() {
         if (num_RNA >= modulo_base)
             num_RNA %= modulo_base;
     }
-    cout << num_RNA << endl;
+    fout << num_RNA << endl;
 
     return 0;
 }

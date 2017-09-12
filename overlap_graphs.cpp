@@ -1,4 +1,4 @@
-#include <iostream>
+#include <fstream>
 #include <string>
 using namespace std;
 #define SIZE 100
@@ -20,6 +20,7 @@ int dna_overlap(string s1, string s2, int k) {
 
 void adjacency_list(string dna[], string rosalind[], int num_dna, int k) {
     int overlap;
+    ofstream fout("output.txt");
 
     for (int i = 0; i < num_dna; i++) {
         for (int j = 0; j < num_dna; j++) {
@@ -28,28 +29,29 @@ void adjacency_list(string dna[], string rosalind[], int num_dna, int k) {
             overlap = dna_overlap(dna[i], dna[j], k);
 
             if (overlap == 1) {
-                cout << rosalind[i] << " " << rosalind[j] << endl;
+                fout << rosalind[i] << " " << rosalind[j] << endl;
             }
         }
     }
+    fout.close();
 }
 
 int main() {
-    int T, num_dna, k;
-    string dna[SIZE], rosalind[SIZE];
+    int num_dna, k = 3, i = -1;
+    string dna[SIZE], rosalind[SIZE], line;
+    ifstream fin("input.txt");
 
-    cin >> T; // number of test cases
-
-    while (T--) {
-        cin >> num_dna >> k;
-
-        for (int i = 0; i < num_dna; i++) {
-            cin >> rosalind[i];
-            cin >> dna[i];
+    while (getline(fin, line)) {
+        if (line.compare(0, 10, ">Rosalind_") == 0) {
+            i++;
+            rosalind[i] = line.substr(1);
+        } else {
+            dna[i] += line;
         }
-
-        adjacency_list(dna, rosalind, num_dna, k);
     }
+
+    adjacency_list(dna, rosalind, i + 1, k);
+    fin.close();
 
     return 0;
 }
