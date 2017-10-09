@@ -45,9 +45,6 @@ def compute_opt(mat, alignment_path, s, t):
             opt_choice = choices.index(mat[i][j])
             alignment_path[i][j] = path_taken(opt_choice)
 
-    print mat
-    print alignment_path
-
 def get_alignment(alignment_path, s, t):
     # Compute the actual alignment of s and t
     i, j = len(s), len(t)
