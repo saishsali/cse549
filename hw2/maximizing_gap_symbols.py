@@ -1,7 +1,11 @@
-diagonal, top, left = 1, 2, 3
-score_match = 10
-score_mismatch = -5
-score_gap = -7
+# score assigned to matched symbol(m) > 0
+score_match = 1
+
+# score assigned to mismatched non-gap symbol(d) < 0
+score_mismatch = -10
+
+# score assigned a symbol matched to a gap symbol '-'
+score_gap = -1
 
 def initialize_matrix(mat, s, t):
     # Initialize m * n matrix with 0 (m = length of s + 1, n = length of t + 1)
@@ -12,6 +16,14 @@ def initialize_matrix(mat, s, t):
         mat.append(row)
 
 def base_case(mat, s, t):
+    # Aligning i characters to 0 characters must use i gaps
+    for i in xrange(len(s) + 1):
+        mat[i][0] = i * score_gap
+
+    for i in xrange(len(t) + 1):
+        mat[0][i] = i * score_gap
+
+def base_case_max_gap(mat, s, t):
     # Aligning i characters to 0 characters must use i gaps
     for i in xrange(len(s) + 1):
         mat[i][0] = i
@@ -26,54 +38,36 @@ def match_cost(a, b):
     else:
         return score_mismatch
 
-def path_taken(choice):
-    # Optimal path taken can be diagonal, top or left
-    if choice == 2:   # Diagonal
-        return diagonal
-    elif choice == 0: # Top
-        return top
-    elif choice == 1: # Left
-        return left
-
-def compute_opt(mat, max_gap, s, t):
-    max1, max2, max3 = 0, 0, 0
+def compute_opt(edit_distance, max_gap, s, t):
     # Compute edit distance matrix and alignment path matrix
     for i in xrange(1, len(s) + 1):
         for j in xrange(1, len(t) + 1):
             choices = [
-                score_gap + mat[i - 1][j],
-                score_gap + mat[i][j - 1],
-                match_cost(s[i - 1], t[j - 1]) + mat[i - 1][j - 1]
+                score_gap + edit_distance[i - 1][j],
+                score_gap + edit_distance[i][j - 1],
+                match_cost(s[i - 1], t[j - 1]) + edit_distance[i - 1][j - 1]
             ]
-            mat[i][j] = max(choices)
-            print s[i - 1], t[j - 1]
-            print mat
-            if mat[i][j] == choices[0]:
-                print "Top"
-                max1 = max_gap[i - 1][j]
-            if mat[i][j] == choices[1]:
-                print "Left"
-                max2 = max_gap[i][j - 1]
-            if mat[i][j] == choices[2]:
-                print "Diagonal"
-                max3 = max_gap[i - 1][j - 1]
-            max_gap[i][j] = max(max1, max2, max3)
-    # print mat
+            edit_distance[i][j] = max(choices)
+            if edit_distance[i][j] == choices[0]:       # If top, add a gap
+                max_gap[i][j] = 1 + max_gap[i - 1][j]
+            elif edit_distance[i][j] == choices[1]:     # If left, add a gap
+                max_gap[i][j] = 1 + max_gap[i][j - 1]
+            elif edit_distance[i][j] == choices[2]:     # If a diagonal, do not add gap
+                max_gap[i][j] = max_gap[i - 1][j - 1]
 
-def edit_distance_alignment(s, t):
+def maximum_gap_symbols(s, t):
     # Compute edit distance alignment
-    mat = []
-    initialize_matrix(mat, s, t)
-    base_case(mat, s, t)
+    edit_distance = []
+    initialize_matrix(edit_distance, s, t)
+    base_case(edit_distance, s, t)
 
     max_gap = []
     initialize_matrix(max_gap, s, t)
-    base_case(max_gap, s, t)
+    base_case_max_gap(max_gap, s, t)
 
-    compute_opt(mat, max_gap, s, t)
+    compute_opt(edit_distance, max_gap, s, t)
 
     return max_gap[len(s)][len(t)]
-
 
 proteins, i = ['', ''], -1
 
@@ -88,7 +82,5 @@ f.close()
 s, t = proteins[0], proteins[1]
 
 f = open('output.txt', 'w')
-# edit_distance, aligned_s, aligned_t = edit_distance_alignment(s, t)
-print edit_distance_alignment(s, t)
-# f.write("%d\n%s\n%s" % (edit_distance, aligned_s, aligned_t))
+f.write(str(maximum_gap_symbols(s, t)))
 f.close()
